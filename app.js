@@ -39,7 +39,65 @@ app.get("/players/", async (request, response) => {
 // API 2
 
 app.post("/players/", async (request, response) => {
+  const playerDetails = request.body;
+  const { playerName, jerseyNumber, role } = playerDetails;
   const postPlayerQuary = `
-    INSERT INTO cricket_team 
+    INSERT INTO 
+    cricket_team (player_name,jersey_number, role)
+    Values 
+    (
+        ${playerName},
+        ${jerseyNumber},
+        ${role}
+    );
     `;
+  const dbResponse = await db.run(postPlayerQuary);
+  response.send("Player Added to Team");
+});
+
+//API 3
+
+app.get("`/players/:playerId/", async (request, response) => {
+  const { playerId } = request.params;
+  const playerDetailsQuary = `
+    SELECT * FROM cricket_team Where player_id = ${playerId};
+    `;
+  const playerDetails = await db.get(playerDetailsQuary);
+  response.send(playerDetails);
+});
+
+// API 4
+
+app.put("`/players/:playerId/", async (request, response) => {
+  const { playerId } = request.params;
+  const playerDetails = request.body;
+  const { playerName, jerseyNumber, role } = playerDetails;
+  const updateQuary = `
+    UPDATE 
+    cricket_team
+     SET
+      (
+          player_name = ${playerName},
+          jersey_number =${jerseyNumber},
+          role=${role}
+      )
+      WHERE 
+        player_id = ${playerId};
+    `;
+  const dbResponse = await db.run(updateQuary);
+  response.send("Player Details Updated");
+});
+
+// API 5
+
+app.delete("/players/:playerId/", async (request, response) => {
+  const { playerId } = request.params;
+  const deleteQuary = `
+    DELETE FROM
+    cricket_team
+    WHERE 
+    player_id = ${playerId};
+    `;
+  const dbResponse = await db.run(deleteQuary);
+  response.send("Player Removed");
 });
