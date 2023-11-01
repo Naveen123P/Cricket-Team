@@ -46,9 +46,9 @@ app.post("/players/", async (request, response) => {
     cricket_team (player_name,jersey_number, role)
     Values 
     (
-        ${playerName},
+        '${playerName}',
         ${jerseyNumber},
-        ${role}
+        '${role}'
     );
     `;
   const dbResponse = await db.run(postPlayerQuary);
@@ -57,7 +57,7 @@ app.post("/players/", async (request, response) => {
 
 //API 3
 
-app.get("`/players/:playerId/", async (request, response) => {
+app.get("/players/:playerId/", async (request, response) => {
   const { playerId } = request.params;
   const playerDetailsQuary = `
     SELECT * FROM cricket_team Where player_id = ${playerId};
@@ -68,7 +68,7 @@ app.get("`/players/:playerId/", async (request, response) => {
 
 // API 4
 
-app.put("`/players/:playerId/", async (request, response) => {
+app.put("/players/:playerId/", async (request, response) => {
   const { playerId } = request.params;
   const playerDetails = request.body;
   const { playerName, jerseyNumber, role } = playerDetails;
@@ -77,9 +77,9 @@ app.put("`/players/:playerId/", async (request, response) => {
     cricket_team
      SET
       (
-          player_name = ${playerName},
+          player_name = '${playerName}',
           jersey_number =${jerseyNumber},
-          role=${role}
+          role='${role}'
       )
       WHERE 
         player_id = ${playerId};
