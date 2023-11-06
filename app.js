@@ -13,7 +13,7 @@ const initilizeDBAndServer = async () => {
   try {
     db = await open({
       filename: dbPath,
-      driver: sqlite3.Database
+      driver: sqlite3.Database,
     });
     app.listen(3000, () => {
       console.log("Server is running at http://localhost:3000");
@@ -26,6 +26,15 @@ const initilizeDBAndServer = async () => {
 
 initilizeDBAndServer();
 
+const convertDbObjectToResponseObject = (dbObject) => {
+  return {
+    playerId: dbObject.player_id,
+    playerName: dbObject.player_name,
+    jerseyNumber: dbObject.jersey_number,
+    role: dbObject.role,
+  };
+};
+
 //API 1
 
 app.get("/players/", async (request, response) => {
@@ -33,7 +42,11 @@ app.get("/players/", async (request, response) => {
     SELECT * FROM cricket_team;
     `;
   const playersArray = await db.all(getBooksQuary);
-  response.send(playersArray);
+  response.send(
+    playersArray.map((eachPlayer) =>
+      convertDbObjectToResponseObject(eachPlayer)
+    )
+  );
 });
 
 // API 2
@@ -63,7 +76,7 @@ app.get("/players/:playerId/", async (request, response) => {
     SELECT * FROM cricket_team Where player_id = ${playerId};
     `;
   const playerDetails = await db.get(playerDetailsQuary);
-  response.send(playerDetails);
+  response.send(convertDbObjectToResponseObject(playerDetails));
 });
 
 // API 4
@@ -76,15 +89,13 @@ app.put("/players/:playerId/", async (request, response) => {
     UPDATE 
     cricket_team
      SET
-      (
           player_name = '${playerName}',
-          jersey_number =${jerseyNumber},
-          role='${role}'
-      )
+          jersey_number = ${jerseyNumber},
+          role = '${role}'
       WHERE 
         player_id = ${playerId};
     `;
-  const dbResponse = await db.run(updateQuary);
+  const dbObject = await db.run(updateQuary);
   response.send("Player Details Updated");
 });
 
